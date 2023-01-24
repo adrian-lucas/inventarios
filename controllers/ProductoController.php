@@ -52,6 +52,10 @@ class ProductoController extends \yii\web\Controller
        
         return $producto;
     }
+    public function actionViewOne()
+    {
+        return Producto::findOne(Yii::$app->getRequest()->getBodyParam('id'));
+    }
 
     public function actionViewAll()
     {
@@ -86,9 +90,27 @@ class ProductoController extends \yii\web\Controller
         $producto->save();
         return $producto;
     }
-    public function actionIndex()
+    public function actionViewProductsBySection()
     {
-        return $this->render('index');
+        $idSection = Yii::$app->getRequest()->getBodyParam('idSection');
+        
+        return Producto::find()
+                        ->where(['seccion_id'=>$idSection])                   
+                        ->all();
+
     }
+    public function actionTotalStockByMark()
+
+    {
+        $idMark = Yii::$app->getRequest()->getBodyParam('id');
+        $totalStock = Producto::find()
+                            ->select(['producto.nombre as nombreproducto','producto.marca_id'])
+                            
+                            ->where(['producto.marca_id'=>$idMark])
+                            ->asArray()
+                            ->all();
+        return $totalStock;
+    }
+   
 
 }
