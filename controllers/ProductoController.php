@@ -45,6 +45,10 @@ class ProductoController extends \yii\web\Controller
         $body = Yii::$app->getRequest()->getBodyParams();
         $model = new  Producto();
         $model->load($body,'');
+        if(!$model->validate())
+        {
+            return ['succes'=> false,'message'=>'Error en el registro','Error'=>$model->errors];
+        }
         if(!$model->save())
         {
             return ['succes'=> false,'message'=>'Error en el registro','Error'=>$model->errors];
@@ -58,14 +62,19 @@ class ProductoController extends \yii\web\Controller
     {   
         $body = Yii::$app->getRequest()->getBodyParam('id');
         $producto = Producto::findOne($body);
-        
-        
+        if($producto == null)
+        {
+            return ['succes'=> false,'message'=>'Error al eliminar producto','Error'=>'producto con id: '.$body.' inexistente'];
+        }
         try{
             $producto->delete();
         }catch(Exception $e){
-            return ['succes'=> false,'message'=>'Error en el registro','Error'=>$producto->errors];
-        }       
+            return['succes'=> false,'message'=>'Error al eliminar producto','Error'=>$e->getMessange()];
+        }
+        
+        return $producto;       
     }
+
     public function actionViewOne()
     {
         return Producto::findOne(Yii::$app->getRequest()->getBodyParam('id'));
@@ -101,10 +110,21 @@ class ProductoController extends \yii\web\Controller
         $body = Yii::$app->getRequest()->getBodyParams();
         $producto = Producto::findOne($body['id']);
         $producto->load($body,'');
-        $producto->save();
-        return $producto;
+        $producto->fecha_actualizacion = date('Y-m-d');
+        if(!$producto->validate())
+        {
+            return ['succes'=> false,'message'=>'Error en la actualizacion de datos','Error'=>$producto->errors];
+        }
+        if(!$producto->save())
+        {
+            return ['succes'=> false,'message'=>'Error en la actualizacion de datos','Error'=>$producto->errors];
+        }
+        else
+        {
+            return ['succes'=> true,'message'=>'La accion se realizo exitosamente','Actualizado'=>$producto];
+        }
     }
-    public function actionViewProductsBySection()
+    public function actionViewProductsBySection()//desde aqui
     {
         $idSection = Yii::$app->getRequest()->getBodyParam('idSection');
         

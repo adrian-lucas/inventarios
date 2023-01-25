@@ -8,14 +8,14 @@ use Yii;
  * This is the model class for table "producto".
  *
  * @property int $id
- * @property string|null $nombre
+ * @property string $nombre
  * @property string|null $descripcion
- * @property float|null $precio
- * @property int|null $stock
- * @property string|null $fecha_creacion
+ * @property float $precio
+ * @property int $stock
+ * @property string $fecha_creacion
  * @property string|null $fecha_actualizacion
- * @property int|null $marca_id
- * @property int|null $seccion_id
+ * @property int $marca_id
+ * @property int $seccion_id
  *
  * @property Marca $marca
  * @property ProductoCategoria[] $productoCategorias
@@ -37,11 +37,14 @@ class Producto extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['nombre', 'precio', 'stock', 'fecha_creacion', 'marca_id', 'seccion_id'], 'required'],
             [['nombre', 'descripcion'], 'string'],
             [['precio'], 'number'],
             [['stock', 'marca_id', 'seccion_id'], 'default', 'value' => null],
             [['stock', 'marca_id', 'seccion_id'], 'integer'],
+            [['precio'],'compare','compareValue'=>0,'operator'=>'>','message'=>'Precio must be greater than zero'],
             [['fecha_creacion', 'fecha_actualizacion'], 'safe'],
+           // [['fecha_creacion', 'fecha_actualizacion'], 'date'],
             [['marca_id'], 'exist', 'skipOnError' => true, 'targetClass' => Marca::class, 'targetAttribute' => ['marca_id' => 'id']],
             [['seccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => Seccion::class, 'targetAttribute' => ['seccion_id' => 'id']],
         ];
