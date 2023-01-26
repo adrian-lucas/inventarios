@@ -45,215 +45,370 @@ class ProductoController extends \yii\web\Controller
 
     public function actionRegister()
     {
-        $body = Yii::$app->getRequest()->getBodyParams();
+        $res = [];
+        $body  = Yii::$app->getRequest()->getBodyParams();
         $model = new  Producto();
         $model->load($body,'');
         $model->fecha_creacion= date('Y-m-d');
        
-        if(!$model->save())
-        {
-            return ['succes'=> false,'message'=>'Error en el registro','Error'=>$model->errors];
+        if(!$model->save()){
+            Yii::$app->getResponse()->setStatusCode(422,'Validacion de datos fallida');
+            $res = [ 
+                'succes'=>false,
+                'message'=>'Producto no registrado',
+                'error'=>$model->errors,
+            ];
+        }else{
+            Yii::$app->getResponse()->setStatusCode(201,'Producto registrado');
+            $res = [
+                'succes'=>true,
+                'message'=>'Producto registrado con éxito',
+                'data'=>$model
+            ];
         }
-        else
-        {
-            return ['succes'=> true,'message'=>'La accion se realizo exitosamente','registrado'=>$model];
-        }
+
+        return $res;
     }
-    public function actionRemove($id)//mensaje de eliminado
+
+    public function actionRemove($id)
     {   
-        $producto = Producto::findOne($id);
-        if($producto == null)
-        {
-            return ['succes'=> false,'message'=>'Error al eliminar producto','Error'=>'producto con id: '.$id.' inexistente'];
+        $res = [];
+        $model = Producto::findOne($id);
+
+        if($model != null){
+            try{
+                $model->delete();
+                $res = [
+                    'succes'=>true,
+                    'message'=>'Producto eliminado',
+                    'data'=>$model, 
+                ];
+            }catch(IntegrityException $ie){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'succes'=>false,
+                    'message'=>'El producto se encuentra en uso',
+                    'error'=>$ie->getMessage(),
+                ];
+    
+            }catch(Exception $e){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'succes'=>false,
+                    'message'=>'Producto no eliminado',
+                    'error'=>$e->getMessage(),
+                ];
+            }
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404,'Producto no entoncontrado');
+            $res = [
+                'succes'=>false,
+                'message'=>'Producto no eliminado',
+                'error'=>'Producto con id: '.$id.' no existe',
+            ];
         }
-        try{
-            $producto->delete();
-        }catch(Exception $e){
-            return['succes'=> false,'message'=>'Error al eliminar producto','Error'=>$e->getMessange()];
+
+        return $res;       
+    }
+
+    public function actionViewOne($id)
+    {
+        $res = [];
+        $model = Producto::findOne($id);
+
+        if($model != null){
+            $res = [
+                'succes'=>true,
+                'message'=>'Producto encontrado',
+                'data'=>$model, 
+            ];
+            
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404, 'Producto no encontrado.');
+            $res = [
+                'succes'=>false,
+                'message'=>'Producto no encontrado',
+                'error'=> 'Producto con id: '.$id.' no existe',
+            ];
         }
-        
-        return $producto;       
+           
+        return $res;
     }
 
-    public function actionViewOne()
+    public function actionViewPagination($pageSize = 10) //Aún sigue con problemas
     {
-        return Producto::findOne(Yii::$app->getRequest()->getBodyParam('id'));
-    }
+        $res = [];
+        $query = Producto::find()
+            ->select(['producto.*','marca.nombre as marca','seccion.descripcion as seccion'])
+            ->leftJoin('seccion','seccion.id = producto.seccion_id')
+            ->leftJoin('marca','marca.id = producto.marca_id')
+            ->orderBy('producto.id')
+            ->asArray();
+            //->all();
 
-    public function actionViewAll()
-    {
-        return Producto::find()->all();
-    }
-
-    public function actionViewPagination() //Informacion de la paginacion
-    {
-        $params = Yii::$app->request->getQueryParams();
-        
-        $pageSize = isset($params['pageSize'])?$params['pageSize']:10;
-        //$page = isset($params['page'])?$params['page']:0;
-       
-        $query = Producto::find()->orderBy('producto.id');
         $provider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 //'page'=>$page,
                 'pageSize' => $pageSize,
-                
             ],
-            'sort' =>[],
+            'sort'=>[],
         ]);
-        return $provider->getModels();
+        $products = $provider->getModels();
+        $pagination = $provider->pagination;
+      //  return $provider->pagination;
+        $currentPage = $pagination->page;
+        
+        $totalPages = $pagination->pageCount;
+        $totalCount = $pagination->totalCount;
+
+        $res =[
+            'succes'=>true,
+            'data'=>$products,
+            'pagination'=>[
+                'previousPage' => $currentPage > 1 ? $currentPage-1 : null,
+                'currentPage' => $currentPage,
+                'nextPage' => $currentPage < $totalPages ? $currentPage+1 : null,
+                'totalPages' => $totalPages,
+                'pageSize' => $pageSize,
+                'totalCount' => $totalCount
+
+            ],
+        ];
+        
+        
+        return $res;
     }
     
     public function actionChangeData($id)
     {
+        $res = [];
         $body = Yii::$app->getRequest()->getBodyParams();
-        $producto = Producto::findOne($id);
-        $producto->load($body,'');
-        $producto->fecha_actualizacion = date('Y-m-d');
+        $model = Producto::findOne($id);
+        $model->load($body,'');
+        $model->fecha_actualizacion = date('Y-m-d');
         
-        if(!$producto->save())
-        {
-            return ['succes'=> false,'message'=>'Error en la actualizacion de datos','Error'=>$producto->errors];
+        if(!$model->save()){
+            Yii::$app->getResponse()->getStatusCode(420,'Error en la validación de datos');
+            $res = [
+                'succes'=> false,
+                'message'=>'No se realizaron los cambios',
+                'error'=>$model->errors
+            ];
         }
         else
         {
-            return ['succes'=> true,'message'=>'La accion se realizo exitosamente','Actualizado'=>$producto];
+            Yii::$app->getResponse()->setStatusCode(201);
+            $res = [
+                'succes'=> true,
+                'message'=>'Se realizaron los cambios',
+                'data'=>$model
+            ];
         }
+        return $res;
     }
-    public function actionViewProductsBySection($idSeccion)//controlar si existe la seccion cambiar al formato indicado
+
+    public function actionViewProductsBySection($idSeccion)
     {
-        
-        $seccion = Seccion::find()
+        $res = [];
+        $model = Seccion::find()
                          ->select(['seccion.id','seccion.codigo as seccion','seccion.descripcion','almacen.codigo as almacen'])
                          ->leftJoin('almacen','almacen_id=almacen.id') 
                          ->where(['seccion.id'=>$idSeccion])
                          ->joinWith('productos')
                          ->asArray()
                          ->one();
-        return $seccion;
+        if($model != null){
+            $res = [
+                'succes'=> true,
+                'message'=>'Seccion encontrada',
+                'data'=>$model
+            ];
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404,'Seccion no encontrada');
+            $res = [
+                'succes'=> false,
+                'message'=>'Seccion no encontrada',
+                'error'=>'Producto con id: '.$idSeccion.' no existe'
+            ];    
+        }
+        return $res;
 
     }
-    public function actionTotalStockByMark($idMarca)//controlar si existe la seccion cambiar al formato indicado
 
+    public function actionTotalStockByMark($idMarca)
     {
-        //$idMark = Yii::$app->getRequest()->getBodyParam('id');
+        $res = [];
         $totalStock = Producto::find()
-        ->select(['SUM(producto.stock) as stockTotal'])
-        ->leftJoin('marca','producto.marca_id=marca.id')
-        ->where(['producto.marca_id'=>$idMarca,])
-        ->groupBy('producto.marca_id')
-        ->asArray()
-        ->one();
-        if($totalStock == null)
-         {
-            return ['succes'=> false,'message'=>'Error al obtener total stock de la marca','Error'=> 'idMarca inexistente'];
-         }
-        $marca = Marca::find()
-                            ->select(['marca.id',
-                                      'marca.nombre as marca',
-                                      'marca.descripcion',
-                                      "({$totalStock['stockTotal']}) as stockTotalDeProductos"])
-                            ->where(['marca.id'=>$idMarca])
-                            ->joinWith([
-                                'productos' => function (\yii\db\ActiveQuery $query) {
-                                    $query->select(['marca_id','nombre','stock']);
-                                }
-                            ])
-                            ->asArray()
-                            ->one();
+            ->select(['SUM(producto.stock) as stockTotal'])
+            ->leftJoin('marca','producto.marca_id=marca.id')
+            ->where(['producto.marca_id'=>$idMarca,])
+            ->groupBy('producto.marca_id')
+            ->asArray()
+            ->one();
+
+        if($totalStock != null){
+            $model = Marca::find()
+            ->select([
+                'marca.id',
+                'marca.nombre as marca',
+                'marca.descripcion',
+                "({$totalStock['stockTotal']}) as stockTotalDeProductos"
+            ])
+            ->where(['marca.id'=>$idMarca])
+            ->joinWith([
+               'productos' => function (\yii\db\ActiveQuery $query) {
+                    $query->select(['marca_id','nombre','stock']);
+                }
+            ])
+            ->asArray()
+            ->one();
+        
+            $res = [
+                'succes'=> true,
+                'message'=>'Marca encontrada',
+                'data'=>$model
+            ];            
+
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404,'Marca no encontrada');
+            $res = [
+                'succes'=> true,
+                'message'=>'Marca no encontrada',
+                'error'=>"Marca con {$idMarca} no existe",
+            ]; 
+        }
        
-        return $marca;
+        return $res;
     }
 
     public function actionMaximumStock()
     {
         $stockMaximo = Producto::find()
-                                ->select(['MAX(stock) as maximo'])
-                                ->asArray()
-                                ->one()['maximo'];
-        $productoConMayorStock = Producto::find()
-                                        ->where(['stock'=>$stockMaximo])
-                                        ->one(); 
+            ->select(['MAX(stock) as maximo'])
+            ->asArray()
+            ->one()['maximo'];
 
-        return   ['succes'=> true,'message'=>'La accion se realizo exitosamente','Producto'=> $productoConMayorStock];
+        $model = Producto::find()
+            ->where(['stock'=>$stockMaximo])
+            ->one(); 
+
+        return[
+            'succes'=> true,
+            'message'=>'La accion se realizo exitosamente',
+            'Producto'=> $model
+        ];
     }
     public function actionIsMoreThanZero($idProducto)
     {
-        $res = false;
-        $message ='';
-        $query = Producto::find()
-                            ->where(['id'=>$idProducto])
-                            ->one();
+        $res = [];
+        $model = Producto::findOne($idProducto);
 
-         if($query == null)
-         {
-            return ['succes'=> false,'message'=>'Error al verififcar stock','error'=> 'Registro no encontrado'];
-         }
+        if($model != null){
+            
+            $res = [
+                'succes' => true,
+                'message' => 'Producto entontrado',
+                'data'=>[
+                    'producto'=>$model->nombre,
+                    'stock'=>$model->stock,
+                    'esCero'=>$model->stock<1,
+                ],
+            ];    
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404);
+            $res = [
+                'succes'=> false,
+                'message'=>'Producto no encontrado',
+                'error'=> "Producto con {$idProducto} no encontrado"
+            ];
+        }
 
-        $res = ($query->stock)<1;
-        return ['producto'=>$query->nombre,'stock'=>$query->stock,'esCero'=>$res];                                                                                         
+        return $res;                                                                         
     }
     
     public function actionUnLinked($idCategoria,$idProducto)
     {
-        $productoCategoria = ProductoCategoria::find()
-                                      ->where(['categoria_id'=>$idCategoria,'producto_id'=>$idProducto])
-                                      ->one();
+        $res = [];
+        $model = ProductoCategoria::find()
+            ->where(['categoria_id'=>$idCategoria,'producto_id'=>$idProducto])
+            ->one();
 
-        if($productoCategoria == null)
-        {
-            return ['succes'=> false,'message'=>'Error al desenlazar producto/categoria','Error'=> 'idProducto o idCategoria inexistente'];
+        if($model != null){
+            try {
+                $model->delete(); 
+            }catch(IntegrityException $ie){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'succes'=>false,
+                    'message'=>'ProductoCategoria se encuentra en uso',
+                    'error'=>$ie->getMessage(),
+                ];
+    
+            }catch(Exception $e){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'succes'=>false,
+                    'message'=>'ProductoCategoria no desenlazado',
+                    'error'=>$e->getMessage(),
+                ];
+            }
+            $res = [
+                'succes'=> true,
+                'message'=>'ProductoCategoria enlazado',
+                'data'=> $model,
+            ];   
+
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404);
+            $res = [
+                'succes'=> false,
+                'message'=>'ProductoCategoria no desenlazado',
+                'error'=> 'idProducto o idCategoria no estan enlazados',
+            ];
         }
-
-        try {
-            $productoCategoria->delete(); 
-        } catch (Exception $e) {
-            return ['succes'=> false,'message'=>'Error al desenlazar producto/categoria','Error'=> $e->getMessage()];
-        }                    
-          
-        return ['succes'=> true,'message'=>'La accion se realizo exitosamente','Desenlazado'=>$productoCategoria];
-    }
-    public function actionUnLinkedByBatch()
-    {
-        $idCategoria = Yii::$app->getRequest()->getBodyParam('idCategoria');
         
-        return ProductoCategoria::find()
-            ->where(['categoria_id'=>$idCategoria])
-            ->asArray()
-            ->all();
-
+        return $res;
     }
+ 
 
-    public function actionLinked()//mantener consistencia al enviar parametros con unlinked,formato de respuestas,
-                                 // verificar si existe antes de utilizar sus metodos, enviar solo un return por funcion
-                                //estructurar y organizar bien el código
-                                //devolver codigo de estado segun las respuestas
-                                //estructurar todas las respuestas
-                                //devolver informacion de paginacion, numero de pagina, total de registros,total de paginas,
+    public function actionLinked($idCategoria,$idProducto)
     {
-        $body = Yii::$app->getRequest()->getBodyParams();
-        $idCategoria = Yii::$app->getRequest()->getBodyParam('categoria_id');
-        $idProducto =  Yii::$app->getRequest()->getBodyParam('producto_id');
-        $productoCategoria = ProductoCategoria::find()
-                                            ->where(['categoria_id'=>$idCategoria,'producto_id'=>$idProducto])
-                                            ->one();
-        if($productoCategoria != null)
-        {
-            return ['succes'=> false,'message'=>'Error al enlazar producto/categoria','Error'=> 'idProducto y idCategoria ya estan enlazados'];
+        $res = [];
+        $model = ProductoCategoria::find()
+            ->where(['categoria_id'=>$idCategoria,'producto_id'=>$idProducto])
+            ->one();
+        if($model != null){
+            $res = [
+                'succes'=> false,
+                'message'=>'Error al enlazar producto/categoria',
+                'error'=> 'Producto y Categoria ya estan enlazados',
+            ];
         }else {
-
-            $productoCategoria = new ProductoCategoria();
-            $productoCategoria->load($body,'');
-            if(!$productoCategoria->save())
+            $model = new ProductoCategoria();
+            $model->producto_id = $idProducto;
+            $model->categoria_id = $idCategoria;
+            
+            if(!$model->save())
             {
-                return ['succes'=> false,'message'=>'Error al enlazar producto/categoria','Error'=>$productoCategoria->errors];
+                Yii::$app->getResponse()->setStatusCode(422,'Validacion de datos fallida');
+                $res = [
+                    'succes'=> false,
+                    'message'=>'Error al enlazar Producto/Categoria',
+                    'error'=>$model->errors
+                
+                ];
             }
             else{
-                return ['succes'=> true,'message'=>'La accion se realizo exitosamente','Enlazado'=>$productoCategoria];
+                $res = [
+                    'succes'=> true,
+                    'message'=>'Producto/Categoria enlazados exitosamente',
+                    'data'=>$model
+                ];
             } 
             
         }
+        return $res;
     }
      
 }
