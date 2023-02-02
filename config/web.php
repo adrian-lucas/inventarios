@@ -7,6 +7,8 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'timeZone' => 'America/La_Paz',
+    'language' => 'es',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -16,8 +18,22 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'z7CtSG2CO3hoFzrVuQT2c_dqQiO_qmWe',
             'parsers' => [
-                'multipart/form-data' => 'yii\web\MultipartFormDataParser'
+                'multipart/form-data' => 'yii\web\MultipartFormDataParser',
+                'multipart/form-data' => 'yii\web\MultipartFormDataParser',
             ],
+        ],
+        'response' => [
+            'format' => yii\web\Response::FORMAT_JSON,
+            'charset' => 'UTF-8',
+            'on beforeSend' => function ($event) {   
+                header("Access-Control-Allow-Origin: *");
+                header("Access-Control-Allow-Methods: *");
+                header("Access-Control-Allow-Headers: *");
+                header("Access-Control-Allow-Credentials: true");
+                header("Access-Control-Request-Headers: *");
+                header("Access-Control-Expose-Headers: *");
+                header("Access-Control-Max-Age: 3600");
+            },
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',

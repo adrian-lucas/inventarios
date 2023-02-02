@@ -37,6 +37,11 @@ class SiteController extends Controller
             ],
         ];
     }
+    public function beforeAction($action)
+    {
+        Yii::$app->response->format= \yii\web\Response::FORMAT_HTML;
+        return parent::beforeAction($action);
+    }
 
     /**
      * {@inheritdoc}
