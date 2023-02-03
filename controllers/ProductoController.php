@@ -26,7 +26,7 @@ class ProductoController extends \yii\web\Controller
                       'remove'=>['delete','get'],
                       'change-data'=>['put'],
                       'view-products-by-section'=>['get'],
-                      'total-stock-by-mark'=>['get'],
+                      'total-stock-by-brand'=>['get'],
                       'maximum-stock'=>['get'],
                       'is-more-than-zeso'=>['get'],
                       'un-linked'=>['delete'],
@@ -39,6 +39,11 @@ class ProductoController extends \yii\web\Controller
     public function beforeAction($action)
     {
         Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
+        
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {         	
+            Yii::$app->getResponse()->getHeaders()->set('Allow', 'POST GET PUT');
+            Yii::$app->end();     	
+        }     
         $this->enableCsrfValidation=false;
         return parent::beforeAction($action);
     }
@@ -52,14 +57,14 @@ class ProductoController extends \yii\web\Controller
         $model->fecha_creacion= date('Y-m-d');
        
         if(!$model->save()){
-            Yii::$app->getResponse()->setStatusCode(422,'Validacion de datos fallida');
+            Yii::$app->getResponse()->setStatusCode(422);
             $res = [ 
                 'succes'=>false,
                 'message'=>'Producto no registrado',
                 'error'=>$model->errors,
             ];
         }else{
-            Yii::$app->getResponse()->setStatusCode(201,'Producto registrado');
+            Yii::$app->getResponse()->setStatusCode(201);
             $res = [
                 'succes'=>true,
                 'message'=>'Producto registrado con éxito',
@@ -189,7 +194,7 @@ class ProductoController extends \yii\web\Controller
         $model->fecha_actualizacion = date('Y-m-d');
         
         if(!$model->save()){
-            Yii::$app->getResponse()->getStatusCode(420,'Error en la validación de datos');
+            Yii::$app->getResponse()->getStatusCode(420);
             $res = [
                 'succes'=> false,
                 'message'=>'No se realizaron los cambios',
@@ -236,7 +241,7 @@ class ProductoController extends \yii\web\Controller
 
     }
 
-    public function actionTotalStockByMark($idMarca)
+    public function actionTotalStockByBrand($idMarca)
     {
         $res = [];
         $totalStock = Producto::find()

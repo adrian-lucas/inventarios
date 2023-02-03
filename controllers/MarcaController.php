@@ -12,9 +12,8 @@ class MarcaController extends \yii\web\Controller
     $behaviors['verbs'] = [
         'class' => \yii\filters\VerbFilter::class,
         'actions' => ['register'=>['post'],
-                      'view-all'=>['get'],
-                      'viewPagination' =>['get'],
-                      'remove'=>['delete','get'],
+                      'total-stock-by-brand'=>['get'],
+                      'view-all-brands'=>['get'],                      
                      ]
      ];
      return $behaviors;
@@ -27,17 +26,24 @@ class MarcaController extends \yii\web\Controller
         return parent::beforeAction($action);
     }
 
-    public function actionTotalStockByMark()
-
+    public function actionTotalStockByBrand($id)
     {
-        $idMark = Yii::$app->getRequest()->getBodyParam('id');
         $totalStock = Marca::find()
                             ->select(['marca.*','producto.stock','producto.nombre as nombreproducto'])
                             ->leftJoin('producto','marca.id = producto.marca_id')
-                            ->where(['marca.id'=>$idMark])
+                            ->where(['marca.id'=>$id])
                             ->asArray()
                             ->all();
         return $totalStock;
+    }
+    public function actionViewAllBrands()
+    {
+        $res = [
+            'succes'=>true,
+            'message'=> 'La accion se realizo correctamente',
+            'data'=> Marca::find()->select(['nombre'])->all(),
+        ];
+        return $res;
     }
 
 
