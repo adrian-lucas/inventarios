@@ -41,7 +41,7 @@ class MarcaController extends \yii\web\Controller
         $res = [
             'succes'=>true,
             'message'=> 'La accion se realizo correctamente',
-            'data'=> Marca::find()->select(['nombre'])->all(),
+            'data'=> Marca::find()->select(['marca.*'])->all(),
         ];
         return $res;
     }

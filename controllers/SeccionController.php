@@ -26,11 +26,10 @@ class SeccionController extends \yii\web\Controller
     }
     public function actionViewAllSeccions()
     {
-        $res = [];
         $res = [
             'succes'=>true,
             'message'=> 'La accion se realizo correctamente',
-            'data'=> Seccion::find()->select(['descripcion'])->all(),
+            'data'=> Seccion::find()->all(),
         ];
         return $res;
     }
