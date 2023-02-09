@@ -15,6 +15,11 @@ class SeccionController extends \yii\web\Controller
                       'total-stock-by-brand'=>['get'],                      
                      ]
      ];
+    $behaviors['authenticator'] = [         	
+    'class' => \yii\filters\auth\HttpBearerAuth::class,         	
+    'except' => ['options']     	
+    ];
+        
      return $behaviors;
     }
 

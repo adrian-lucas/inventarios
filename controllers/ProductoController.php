@@ -8,7 +8,6 @@ use app\models\Seccion;
 use app\models\Marca;
 
 use yii\data\ActiveDataProvider;
-use yii\base\ErrorException;
 use yii\db\IntegrityException;
 use Exception;
 
@@ -33,6 +32,11 @@ class ProductoController extends \yii\web\Controller
                       'linked'=>['post'],
                      ]
      ];
+    $behaviors['authenticator'] = [         	
+    'class' => \yii\filters\auth\HttpBearerAuth::class,         	
+    'except' => ['options']     	
+    ];
+        
      return $behaviors;
     }
 
@@ -105,7 +109,7 @@ class ProductoController extends \yii\web\Controller
                 ];
             }
         }else{
-            Yii::$app->getResponse()->setStatusCode(404,'Producto no entoncontrado');
+            Yii::$app->getResponse()->setStatusCode(404);
             $res = [
                 'succes'=>false,
                 'message'=>'Producto no eliminado',
@@ -162,7 +166,7 @@ class ProductoController extends \yii\web\Controller
         $products = $provider->getModels();
         $pagination = $provider->pagination;
       //  return $provider->pagination;
-        $currentPage = $pagination->page;
+        $currentPage = $pagination->page+1;
         
         $totalPages = $pagination->pageCount;
         $totalCount = $pagination->totalCount;

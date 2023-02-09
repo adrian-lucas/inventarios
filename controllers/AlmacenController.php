@@ -12,9 +12,13 @@ class AlmacenController extends \yii\web\Controller
     $behaviors['verbs'] = [
         'class' => \yii\filters\VerbFilter::class,
         'actions' => ['register'=>['post'],
-                      
-                     ]
+                    ]
      ];
+    $behaviors['authenticator'] = [         	
+    'class' => \yii\filters\auth\HttpBearerAuth::class,         	
+    'except' => ['options']     	
+     ];
+        
      return $behaviors;
     }
 

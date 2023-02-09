@@ -16,6 +16,11 @@ class MarcaController extends \yii\web\Controller
                       'view-all-brands'=>['get'],                      
                      ]
      ];
+    $behaviors['authenticator'] = [         	
+    'class' => \yii\filters\auth\HttpBearerAuth::class,         	
+    'except' => ['options']     	
+    ];
+        
      return $behaviors;
     }
 
