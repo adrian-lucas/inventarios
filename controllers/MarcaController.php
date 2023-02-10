@@ -27,6 +27,10 @@ class MarcaController extends \yii\web\Controller
     public function beforeAction($action)
     {
         Yii::$app->response->format= \yii\web\Response::FORMAT_JSON;
+        if (Yii::$app->getRequest()->getMethod() === 'OPTIONS') {         	
+            Yii::$app->getResponse()->getHeaders()->set('Allow', 'POST GET PUT');
+            Yii::$app->end();     	
+        }    
         $this->enableCsrfValidation=false;
         return parent::beforeAction($action);
     }
