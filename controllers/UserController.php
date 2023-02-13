@@ -3,6 +3,7 @@
 namespace app\controllers;
 use Yii;
 use app\models\Usuario;
+use yii\rbac\ManagerInterface;
 class UserController extends \yii\web\Controller
 {
     public function behaviors()
@@ -12,12 +13,15 @@ class UserController extends \yii\web\Controller
         'class' => \yii\filters\VerbFilter::class,
         'actions' => ['register'=>['post'],
                       'login'=>['post'], 
+                      'create-permission'=>['post'],
+                      'create-role'=>['post'],
+                      'assing-role'=>['post'],
                     ],
         ];
      
     $behaviors['authenticator'] = [         	
     'class' => \yii\filters\auth\HttpBearerAuth::class,         	
-    'except' => ['options','login']     	
+    'except' => ['options','login','create-role','create-permission','assing-role']     	
     ]; 
     
     
@@ -99,6 +103,29 @@ class UserController extends \yii\web\Controller
         }
         return $res;
     }
+    public function actionCreateRole()
+    {
+        $auth = Yii::$app->authManager;
+        $role = $auth->createRole(Yii::$app->getRequest()->getBodyParam('role'));
+        $auth->add($role);
+        return $role;
+
+    }
+    public function actionCreatePermission()
+    {
+        $auth = Yii::$app->authManager;
+        $permission = $auth->createPermission(Yii::$app->getRequest()->getBodyParam('permission'));
+        $auth->add($permission);
+        return $permission;
+    }
+    public function actionAssingRole()
+    {
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole('Espectador');
+        $auth->assign($role, 11);
+        return $role;
+    }
+    
 
     public function actionIndex()
     {

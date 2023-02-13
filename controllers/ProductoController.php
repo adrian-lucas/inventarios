@@ -36,6 +36,38 @@ class ProductoController extends \yii\web\Controller
     'class' => \yii\filters\auth\HttpBearerAuth::class,         	
     'except' => ['options']     	
     ];
+    $behaviors['access'] = [         	
+        'class' => \yii\filters\AccessControl::class,
+        'only' => ['register','remove','view-pagination'], 
+        'except' => [],	
+        'rules' => [
+            [
+            'allow' => true, 
+            'actions' => ['register','view-pagination'], 
+            'roles' => ['Administrador']  //
+            ],
+            [
+            'allow' => true, 
+            'actions' => ['view-pagination'], 
+            'roles' => ['Espectador'] 
+            ],
+            [
+            'allow' => true, 
+            'actions' => ['acciones'], 
+            'matchCallback' => function ($rule, $action) {     
+            return true;
+            }
+            ],
+            [
+            'allow' => true, 
+            'actions' => ['acciones'], 
+            'matchCallback' => function ($rule, $action) {
+                return Yii::$app->user->identity ? true : false;
+                }
+            ],
+        ],
+        ];
+        
         
      return $behaviors;
     }
