@@ -412,6 +412,8 @@ COPY public.almacen (id, codigo, descripcion) FROM stdin;
 --
 
 COPY public.auth_assignment (item_name, user_id, created_at) FROM stdin;
+Administrador	1	1676300223
+Espectador	11	1676300987
 \.
 
 
@@ -420,6 +422,11 @@ COPY public.auth_assignment (item_name, user_id, created_at) FROM stdin;
 --
 
 COPY public.auth_item (name, type, description, rule_name, data, created_at, updated_at) FROM stdin;
+Administrador	1	\N	\N	\N	\N	\N
+crearProductos	2	\N	\N	\N	\N	\N
+crearUsuarios	2	\N	\N	\N	\N	\N
+actualizarProducto	2	\N	\N	\N	1676299793	1676299793
+Espectador	1	\N	\N	\N	1676299586	1676299586
 \.
 
 
@@ -1135,7 +1142,6 @@ COPY public.producto (id, nombre, descripcion, precio, stock, fecha_creacion, fe
 273	Red Curry	Real Thai Red Curry with Vegetables is ready to cook meal packet. You just need to cook or microwave it and it can be served with Real Thai Jasmine Rice.\nBenefits \n1. Made with all-natural ingredients.\n2. Tasty and healthy, it's ready to eat product.	270.00	10	2021-03-04 00:00:00	\N	974	30
 25	Veggieeeeee	Food Grade High Quality Plastic, Keep and store knife away from the reach of children. Multi use 2-in-1 Veg Cutter with Round Sharp steel blade along with slicer, Specially designed for cutting vegetables and fruits with locking system. Easy to use and wash	195.00	81	2020-12-10 00:00:00	2023-02-10 00:00:00	2111	10
 27	Granola - Happy Berries	Fit & Flex granola is not just crunchy and tasty, it is also incredibly great for you. It is the perfect start to your every morning and packs quite a nutritious punch. Easy to chew, amazingly high on flavour and delightfully caramelised just right, is how we describe Fit & Flex granola.	245.00	52	2022-01-08 00:00:00	\N	1889	8
-28	Flaxseed - Pesticide Free	Super-nutritious and good for your heart, flaxseed is also a rich source of fibre and Omega-3 fatty acids. We procure our flax seeds from the Gond tribes of eastern Madhya Pradesh who are traditionally practitioners of sustainable farming over many generations. Sprinkle into your morning breakfast cereal or porridge or make a blitz together with chillies, ginger, coconut and lemon juice for an interesting nutritious twist to idli chutney breakfast.  All Safe Harvest products are cultivated completely devoid of synthetic chemical pesticides.	53.90	7	2020-03-11 00:00:00	\N	1262	39
 30	Lip Butter - Rose	Reload the dry and chapped lips with Organic Lip Butter Rose. The ideal mixture of organic butter and waxes instantly brightens your lips with red colour. Whenever you apply the colour it adds on to your charm with a rich creamy texture.	169.15	18	2018-10-04 00:00:00	\N	1102	37
 31	Fruit Power - Masala Sugarcane	Sugarcane and Spicy Masala, a love story that has been part of every Indian home across generations. Real Masala Sugarcane is one of the 1st in India offering the benefits of your age-old sugarcane juice with a sprinkling of traditional Indian masala in the hygienic Tetra pack format. So relish every drop of our new Masala Sugarcane beverage that promises to refresh you with every gulp. Savour the natural sugarcane goodness brought to your home by Real.	19.00	54	2019-08-10 00:00:00	\N	1463	38
 32	Chocobakes Choc Filled Cookies	Experience new exciting chocolatey centre filled cookie from Cadbury. Perfect as an indulgent "me time" treat or to relish happy moments with your loved ones and friends. Indulge in the taste of this amazing combination of delicious cookies that enrobe a smooth Chocolatey centre.	102.00	8	2021-01-09 00:00:00	\N	272	18
@@ -2110,6 +2116,8 @@ COPY public.producto (id, nombre, descripcion, precio, stock, fecha_creacion, fe
 1009	mouse	gama media	78.00	260	2023-02-03 00:00:00	\N	383	8
 1010	mouse2	gama media	78.00	260	2023-02-03 00:00:00	\N	383	8
 1012	monitor	23 pulgadas	200.00	100	2023-02-03 00:00:00	\N	383	8
+1035	botellas	de plastico	3.00	5	2023-02-08 00:00:00	2023-02-13 00:00:00	975	9
+1038	toma todos	material plastico	8.00	7	2023-02-13 00:00:00	\N	2094	15
 1013	televisores	tactiles	150.00	155	2023-02-06 00:00:00	\N	293	15
 1014	televisores	tactiles	150.00	155	2023-02-06 00:00:00	\N	712	9
 1015	televisores	tactiles	150.00	155	2023-02-06 00:00:00	\N	712	9
@@ -2122,13 +2130,13 @@ COPY public.producto (id, nombre, descripcion, precio, stock, fecha_creacion, fe
 928	Himalayan Raw Apple Cider Vinegarrrr	Dabur presents a 100% natural, unfiltered, undiluted & unpasteurized Apple Cider Vinegar with genuine mother of Vinegar content. It is made by fermenting the real apple juice, extracted from the finest of Himalayan apples, in order to obtain maximum health & wellness benefits. It is naturally rich in antioxidants and contains no added colours or preservatives.\nThis apple cider vinegar has numerous health and wellness benefits like it helps in boosting immunity, promotes healthy liver, improves digestion and metabolism, assists in managing weight, and healthy lipid levels. It is can be used as a preservative. Apart from this it serves as the nourishment for dry scalp and makes your skin and hair, glow and shine. It also has beneficial effects for sore throat, teeth whitening & bad breath.	296.00	25	2018-09-05 00:00:00	2023-02-08 00:00:00	1186	16
 1026	cargador	tres entradas	6.00	5	2023-02-08 00:00:00	\N	1111	12
 1031	microfonos	asdfsdf	4.00	4	2023-02-08 00:00:00	\N	712	10
+1039	tripodes	solo tienen dos patas	9.00	8	2023-02-13 00:00:00	\N	1186	2
 1028	productossss	asdfsdf	4.00	5	2023-02-08 00:00:00	2023-02-08 00:00:00	975	11
 1029	nuevo nombre	asdfdf	3.00	3	2023-02-08 00:00:00	2023-02-08 00:00:00	561	8
 1021	teclados 222	lizos	4.00	6	2023-02-07 00:00:00	2023-02-08 00:00:00	1186	3
 1033	aaaaaaaa	asdfds	3.00	4	2023-02-08 00:00:00	2023-02-08 00:00:00	1186	6
-1034	cablessssssss	grosor 12	8.00	4	2023-02-08 00:00:00	2023-02-08 00:00:00	970	16
-1035	botellas	plasticas	3.00	5	2023-02-08 00:00:00	\N	975	9
 1036	focos 	bajo consumo	6.00	4	2023-02-08 00:00:00	2023-02-08 00:00:00	975	9
+1037	coca cola	cero azucas	6.00	7	2023-02-13 00:00:00	\N	1533	8
 \.
 
 
@@ -2140,7 +2148,6 @@ COPY public.producto_categoria (id, producto_id, categoria_id) FROM stdin;
 23	35	4
 26	25	4
 28	27	3
-29	28	10
 31	30	8
 32	31	11
 33	32	9
@@ -3109,7 +3116,6 @@ COPY public.producto_categoria (id, producto_id, categoria_id) FROM stdin;
 1022	35	53
 1025	25	33
 1027	27	20
-1028	28	66
 1030	30	26
 1031	31	23
 1032	32	92
@@ -4139,6 +4145,7 @@ COPY public.usuario (id, nombres, username, password, password_hash, access_toke
 7	mariana	mari	789456	$2y$13$uM4kVJmhFepCL068TNhrLe01JNQZepLg.6XEgKgDBMDSwc0IcU8iu	4kHAN0m8jwXM7k7uEixtGKlRANqlHtbz	\N
 8	asdf	sdfdsf	qwer	$2y$13$A9whE9JrAI7QtuGbbc4.6eEJouY5zWElEYuCopHAUXCiXha7T5zAm	b0HyzzV1ClR3c1mvwEDJG8QBfGs_khyL	\N
 10	post	put	get	$2y$13$8OdRz8M4I7eTP0li308aJ.onbtWD7poBS04aQSNCFmE0qzIPhFJey	q8UFegZ5OEQZs8qu_BVX5AMQdQquoLcT	\N
+11	maria	marimar	789456	$2y$13$6TVYpGnP1JgnDHtSlGiYVu1EPb2LcxxfoH0Y0vf/qNNNs21VARudm	04oMV55T_PEFhmfUXsj-gXRi5yk13llW	\N
 \.
 
 
@@ -4174,7 +4181,7 @@ SELECT pg_catalog.setval('public.producto_categoria_id_seq', 2005, true);
 -- Name: producto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.producto_id_seq', 1036, true);
+SELECT pg_catalog.setval('public.producto_id_seq', 1039, true);
 
 
 --
@@ -4188,7 +4195,7 @@ SELECT pg_catalog.setval('public.seccion_id_seq', 42, true);
 -- Name: usuario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.usuario_id_seq', 10, true);
+SELECT pg_catalog.setval('public.usuario_id_seq', 11, true);
 
 
 --
