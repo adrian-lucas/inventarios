@@ -412,8 +412,9 @@ COPY public.almacen (id, codigo, descripcion) FROM stdin;
 --
 
 COPY public.auth_assignment (item_name, user_id, created_at) FROM stdin;
-Administrador	1	1676300223
 Espectador	11	1676300987
+SuperAdmin	1	1676300223
+Admin	7	\N
 \.
 
 
@@ -422,11 +423,14 @@ Espectador	11	1676300987
 --
 
 COPY public.auth_item (name, type, description, rule_name, data, created_at, updated_at) FROM stdin;
-Administrador	1	\N	\N	\N	\N	\N
-crearProductos	2	\N	\N	\N	\N	\N
-crearUsuarios	2	\N	\N	\N	\N	\N
 actualizarProducto	2	\N	\N	\N	1676299793	1676299793
 Espectador	1	\N	\N	\N	1676299586	1676299586
+Admin	1	\N	\N	\N	\N	\N
+eliminarProducto	2	\N	\N	\N	1676365570	1676365570
+SuperAdmin	1	\N	\N	\N	1676365903	1676365903
+visualizarDatos	2	\N	\N	\N	1676366457	1676366457
+crearProducto	2	\N	\N	\N	\N	\N
+crearUsuario	2	\N	\N	\N	\N	\N
 \.
 
 
@@ -435,6 +439,14 @@ Espectador	1	\N	\N	\N	1676299586	1676299586
 --
 
 COPY public.auth_item_child (parent, child) FROM stdin;
+Espectador	visualizarDatos
+Admin	crearProducto
+Admin	eliminarProducto
+Admin	actualizarProducto
+SuperAdmin	crearUsuario
+SuperAdmin	Espectador
+SuperAdmin	Admin
+Admin	Espectador
 \.
 
 
@@ -1141,19 +1153,18 @@ COPY public.producto (id, nombre, descripcion, precio, stock, fecha_creacion, fe
 81	Chips - Topica	Made with Topica	65.00	12	2021-08-11 00:00:00	\N	1032	28
 273	Red Curry	Real Thai Red Curry with Vegetables is ready to cook meal packet. You just need to cook or microwave it and it can be served with Real Thai Jasmine Rice.\nBenefits \n1. Made with all-natural ingredients.\n2. Tasty and healthy, it's ready to eat product.	270.00	10	2021-03-04 00:00:00	\N	974	30
 25	Veggieeeeee	Food Grade High Quality Plastic, Keep and store knife away from the reach of children. Multi use 2-in-1 Veg Cutter with Round Sharp steel blade along with slicer, Specially designed for cutting vegetables and fruits with locking system. Easy to use and wash	195.00	81	2020-12-10 00:00:00	2023-02-10 00:00:00	2111	10
-27	Granola - Happy Berries	Fit & Flex granola is not just crunchy and tasty, it is also incredibly great for you. It is the perfect start to your every morning and packs quite a nutritious punch. Easy to chew, amazingly high on flavour and delightfully caramelised just right, is how we describe Fit & Flex granola.	245.00	52	2022-01-08 00:00:00	\N	1889	8
 30	Lip Butter - Rose	Reload the dry and chapped lips with Organic Lip Butter Rose. The ideal mixture of organic butter and waxes instantly brightens your lips with red colour. Whenever you apply the colour it adds on to your charm with a rich creamy texture.	169.15	18	2018-10-04 00:00:00	\N	1102	37
 31	Fruit Power - Masala Sugarcane	Sugarcane and Spicy Masala, a love story that has been part of every Indian home across generations. Real Masala Sugarcane is one of the 1st in India offering the benefits of your age-old sugarcane juice with a sprinkling of traditional Indian masala in the hygienic Tetra pack format. So relish every drop of our new Masala Sugarcane beverage that promises to refresh you with every gulp. Savour the natural sugarcane goodness brought to your home by Real.	19.00	54	2019-08-10 00:00:00	\N	1463	38
 32	Chocobakes Choc Filled Cookies	Experience new exciting chocolatey centre filled cookie from Cadbury. Perfect as an indulgent "me time" treat or to relish happy moments with your loved ones and friends. Indulge in the taste of this amazing combination of delicious cookies that enrobe a smooth Chocolatey centre.	102.00	8	2021-01-09 00:00:00	\N	272	18
 33	Amber - Deodorant Body Spray	Smellcome to Magic with Old Spice’s New Launch Deodorant range. 0% Gas and for long-lasting 24-hour freshness. A fruity fragrance with notes of blackberry, black raspberry, and plum, rounded out with sweet vanilla and amber notes at the base. Armed with Amber, flanked by the Old Spice eagles, you have the beacon to freely spread joy amongst your smellectorate.	211.65	88	2020-09-11 00:00:00	\N	60	36
 34	Green Tea - Tulsi Loose Leaf	Octavius Tulsi Green Tea, is a unique combination where both the herbs help in refreshing and energizing the body and mind. It promotes metabolism which is vital for weight management. Green tea and Tulsi offer a vast array of remarkable health benefits including an abundance of antioxidants.	225.00	34	2021-09-11 00:00:00	\N	1969	19
 36	Dhania - Dal	Finest quality split coriander seeds roasted and mildly salted; crunchy and crisp. A traditional mouth freshener and an excellent post-meal digestive. Coriander Seeds are rich in Vit-C (the only seed to do so), Vit-B family and thiamin, riboflavin, and niacin. Coriander seeds are anti-bacterial, anti-microbial and anti-inflammatory in nature, and hence, consuming dhana dal after meals can have many medicinal benefits.	98.00	26	2018-08-02 00:00:00	\N	2281	4
-37	Pudina Chutney Masala	Catch Pudina Chutney is a spicy dip made from mint leaves. This Pudina chutney masala is perfect for making the traditional Indian condiment. It is an extremely flavour condiment and is served in small quantities. It is one of the most popular Indian chutneys around, as it can be served with almost any food. Catch Pudina Chutney Masala is made using Low-Temperature Grinding technology.	46.75	85	2019-11-03 00:00:00	\N	1515	10
 38	Bodylicious Deodorant Spray - Mate (For Men)	Engage Man Mate Deo Spray  For Beauty tips, tricks & more visit https://bigbasket.blog/	136.50	22	2021-07-11 00:00:00	\N	141	26
 39	Sport Deo Spray - Fresh, for Men	A refreshing fresh fragrance with sparkling citrus top notes, sophisticated floral heart notes and a comples woody-musky base, which is perfect for a hot summer day or an enchanting date night.  For Beauty tips, tricks & more visitÃ‚Â https://bigbasket.blog/	112.75	67	2021-10-12 00:00:00	\N	141	18
 40	Choco Deck - Mini Delights	Fabelle brings you Fabelle Choco Deck – Mini Delights, a pack of mini Milk Chocolate bars that will impress everyone, regardless of age. Perfect for gifting, it will make moments of celebration and bonding with friends and family even more special. Each bar is made of a layer of rich choco creme cradled between two layers of Milk Chocolate.\nExperience an explosion of chocolate in your mouth as you first taste the sweetness from milk chocolate followed by the richness from the choco crème. Handcrafted by the Master Chocolatiers from the House of ITC, Fabelle gives you a dessert like an experience in a chocolate bar. Finding the perfect gift can be tricky so when in doubt, gift chocolate!	160.00	13	2021-04-06 00:00:00	\N	850	31
 41	Eau De Toilette - Homme Green	Colour Me is the of one of Milton Lloyds wonders. Now get a long-lasting, luxury fragrance in form of different variants of Colour Me. Take advantage of the finest quality and longest lasting oils, put in the highest concentration to ensure you a repeated delight.	427.50	76	2020-06-09 00:00:00	\N	33	15
 126	Premium Square Plastic Container - Green	These containers are microwave safe but without its lid and is refrigerator safe and dishwasher safe. Use it only for reheating the food and not for cooking food in this container. All containers are airtight but not leakproof.	179.00	19	2020-07-04 00:00:00	\N	404	35
+27	Granola - Happy Berriessssssss	Fit & Flex granola is not just crunchy and tasty, it is also incredibly great for you. It is the perfect start to your every morning and packs quite a nutritious punch. Easy to chew, amazingly high on flavour and delightfully caramelised just right, is how we describe Fit & Flex granola.	245.00	52	2022-01-08 00:00:00	2023-02-14 00:00:00	1889	8
 42	Lemon & Tea Tree Oil Soap	The new Liril soap, with its active ingredients like tea tree oil and lemon extract, gives you a freshness that lasts longer. The soap gives you a fragrance which not only lasts the whole day long as well as keeps your skin healthy. This soap ensures that your skin gets the best care and stays fresh. At the very same time, this soap also ensures that not only your skin retains its natural moisture but also maintains its oil balance. The lemon and tea tree oil ingredients in this soap give you a thick lather which lends a sense of freshness after every shower and makes bathing an enjoyable experience. The fragrance with cues of Lemon provides an invigorating shower experience. This soap has been consistent in bringing alive freshness. This soap also lasts for a long time and is a great choice for a daily refreshing shower! Buy the new Liril Soap in a 125-gm bar now, right here! With active ingredients, the Liril Lime Soap gives you freshness that lasts all day long. The lemon and tea tree oil ingredients in this soap give you instant freshness after every shower. Buy the Liril Lime Soap in a 125-gm bar, right here!	360.00	10	2019-01-02 00:00:00	\N	765	13
 43	Flavoured Cream Wafer Roll - Strawberry	Very crispiest texture and pleasant odour of flavour.	275.00	53	2022-05-12 00:00:00	\N	1291	36
 44	Storage/Lunch Steel Container with PP Lid - Red	Add a dash of colour to your kitchen with these colourful and functional microwave safe stainless steel plastic coated containers with lid from Classic Essential. The containers have a steel interior and a plastic-coated exterior and can be used easily for reheating food or simply serving and storing your snacks/cereals.The exterior plastic gets heated first which in turn heats up the inner steel in which your food is absolutely safe of any toxins. Hence it might take longer than usual to heat up in the microwave. So go ahead and buy yourself a set.	109.00	97	2020-11-02 00:00:00	\N	77	39
@@ -2134,9 +2145,12 @@ COPY public.producto (id, nombre, descripcion, precio, stock, fecha_creacion, fe
 1028	productossss	asdfsdf	4.00	5	2023-02-08 00:00:00	2023-02-08 00:00:00	975	11
 1029	nuevo nombre	asdfdf	3.00	3	2023-02-08 00:00:00	2023-02-08 00:00:00	561	8
 1021	teclados 222	lizos	4.00	6	2023-02-07 00:00:00	2023-02-08 00:00:00	1186	3
-1033	aaaaaaaa	asdfds	3.00	4	2023-02-08 00:00:00	2023-02-08 00:00:00	1186	6
 1036	focos 	bajo consumo	6.00	4	2023-02-08 00:00:00	2023-02-08 00:00:00	975	9
 1037	coca cola	cero azucas	6.00	7	2023-02-13 00:00:00	\N	1533	8
+1041	lo que nosotros	sdfdsf	5.00	6	2023-02-14 00:00:00	\N	975	11
+1042	nuevoProducto\n	Se crea para reemplazar al anterior	8.00	7	2023-02-14 00:00:00	\N	1186	6
+1040	ppppppp	sdfdsf	7.00	6	2023-02-14 00:00:00	2023-02-14 00:00:00	293	1
+1043	producto de prueba	sdfdsf	5.00	6	2023-02-14 00:00:00	\N	1102	1
 \.
 
 
@@ -2154,7 +2168,6 @@ COPY public.producto_categoria (id, producto_id, categoria_id) FROM stdin;
 34	33	8
 35	34	11
 36	36	10
-37	37	10
 38	38	8
 39	39	8
 40	40	3
@@ -3122,7 +3135,6 @@ COPY public.producto_categoria (id, producto_id, categoria_id) FROM stdin;
 1033	33	51
 1034	34	59
 1035	36	86
-1036	37	86
 1037	38	51
 1038	39	98
 1039	40	89
@@ -4181,7 +4193,7 @@ SELECT pg_catalog.setval('public.producto_categoria_id_seq', 2005, true);
 -- Name: producto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.producto_id_seq', 1039, true);
+SELECT pg_catalog.setval('public.producto_id_seq', 1043, true);
 
 
 --

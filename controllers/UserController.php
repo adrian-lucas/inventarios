@@ -3,7 +3,6 @@
 namespace app\controllers;
 use Yii;
 use app\models\Usuario;
-use yii\rbac\ManagerInterface;
 class UserController extends \yii\web\Controller
 {
     public function behaviors()
@@ -21,9 +20,34 @@ class UserController extends \yii\web\Controller
      
     $behaviors['authenticator'] = [         	
     'class' => \yii\filters\auth\HttpBearerAuth::class,         	
-    'except' => ['options','login','create-role','create-permission','assing-role']     	
+    'except' => ['options','login','create-role','create-permission','assing-role','init']     	
     ]; 
-    
+    $behaviors['access'] = [         	
+        'class' => \yii\filters\AccessControl::class,
+        'only' => ['register'], 
+        'except' => [],	
+        'rules' => [
+            [
+            'allow' => true, 
+            'actions' => ['register'], 
+            'roles' => ['SuperAdmin'] 
+            ],
+            [
+            'allow' => true, 
+            'actions' => ['acciones'], 
+            'matchCallback' => function ($rule, $action) {     
+            return true;
+            }
+            ],
+            [
+            'allow' => true, 
+            'actions' => ['acciones'], 
+            'matchCallback' => function ($rule, $action) {
+                return Yii::$app->user->identity ? true : false;
+                }
+            ],
+        ],
+        ];
     
     return $behaviors;
     }
@@ -73,6 +97,7 @@ class UserController extends \yii\web\Controller
 
     public function actionLogin(){
         $res =[];
+        $auth = Yii::$app->authManager;
         $body = Yii::$app->getRequest()->getBodyParams();
         $password = isset($body['password'])?$body['password']:null;
         $username = isset($body['username'])?$body['username']:null;
@@ -84,7 +109,14 @@ class UserController extends \yii\web\Controller
                 $res=[
                     'succes'=>true,
                     'message'=>'Verificacion exitosa',
-                    'acces_token'=>$model->access_token,
+                    'data'=>[
+                        'access_token'=>$model->access_token,
+                        'userInfo'=>[
+                            'nombres'=>$model->nombres,
+                            'username'=>$model->username,
+                            'role'=> array_keys($auth->getRolesByUser($model->id))[0],
+                        ]
+                    ]
                 ];
                 
             }else{
@@ -126,7 +158,6 @@ class UserController extends \yii\web\Controller
         return $role;
     }
     
-
     public function actionIndex()
     {
         return $this->render('index');

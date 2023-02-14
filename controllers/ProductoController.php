@@ -38,18 +38,18 @@ class ProductoController extends \yii\web\Controller
     ];
     $behaviors['access'] = [         	
         'class' => \yii\filters\AccessControl::class,
-        'only' => ['register','remove','view-pagination'], 
+        'only' => ['register','remove','view-pagination','change-data'], 
         'except' => [],	
         'rules' => [
             [
             'allow' => true, 
-            'actions' => ['register','view-pagination'], 
-            'roles' => ['Administrador']  //
+            'actions' => ['register','change-data','remove'], 
+            'roles' => ['Admin'] 
             ],
             [
-            'allow' => true, 
-            'actions' => ['view-pagination'], 
-            'roles' => ['Espectador'] 
+                'allow' => true, 
+                'actions' => ['view-pagination'], 
+                'roles' => ['Espectador'] 
             ],
             [
             'allow' => true, 
