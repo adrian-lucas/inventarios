@@ -3,6 +3,8 @@
 namespace app\controllers;
 use Yii;
 use app\models\Usuario;
+use yii\db\IntegrityException;
+use Exception;
 class UserController extends \yii\web\Controller
 {
     public function behaviors()
@@ -63,11 +65,37 @@ class UserController extends \yii\web\Controller
         $this->enableCsrfValidation=false;
         return parent::beforeAction($action);
     }
-
     public function actionRegister()
     {
         $res = [];
         $body = Yii::$app->getRequest()->getBodyParams();
+        $role = isset($body['role'])?$body['role']:null;
+        $resRegisterUser = $this->actionRegisterUser($body);
+        if($resRegisterUser['success']){
+            $user = $resRegisterUser['data'];
+            $resAssingRole = $this->actionAssingRole($user->id,$role);
+            if($resAssingRole['success']){
+                Yii::$app->getResponse()->setStatusCode(201);
+                $res = [
+                    'succes'=>true,
+                    'message'=>'Usuario registrado con exito',
+                    'data'=>[
+                        'nombres'=>$user->nombres,
+                        'username'=>$user->username,
+                        'role'=>$role
+                    ]
+                ];
+            }else{
+              $res = $this->actionDelete($user->id);
+            }
+        }else{
+            $res = $resRegisterUser;
+        }
+        return $res;
+    }
+    private function actionRegisterUser($body)
+    {
+        $res = [];
         $password = isset($body['password'])?$body['password']:null;
         $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($password);
         $accessToken = Yii::$app->security->generateRandomString();
@@ -77,22 +105,89 @@ class UserController extends \yii\web\Controller
         $model->password_hash = $passwordHash;
         $model->access_token = $accessToken;
         if($model->save()){
-            Yii::$app->getResponse()->setStatusCode(201);
+           // Yii::$app->getResponse()->setStatusCode(201);
             $res=[
-                'succes'=>true,
+                'success'=>true,
                 'message'=>'Nuevo usuario registrado',
-                'data'=>[],
+                'data'=>$model
             ];
         }else{
             Yii::$app->getResponse()->setStatusCode(422,'Data validation failed');
             $res=[
-                'succes'=>false,
+                'success'=>false,
                 'message'=>'El usuario no pudo ser registrado',
                 'data'=>$model->errors,
             ];
         }
 
         return $res;
+    }
+    private function actionAssingRole($userId,$userRole)
+    {
+        $res = [];
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole($userRole);
+
+        if($role != null){
+            try{
+                $auth->assign($role, $userId);
+            }catch(Exception $e){
+                $res = [
+                    'success'=>false,
+                    'message'=>'Usuario y rol se asignaron anteriormente',
+                ];
+            }
+            $res = [
+                'success'=>true,
+                'message'=>'Usuario y rol se asignaron correctamente',
+            ];
+        }else{
+            $res = [
+                'success'=>false,
+                'message'=>'Rol inexistente',
+            ];
+        }
+        return $res;
+    }
+
+    private function actionDelete($id)
+    {   
+        $res = [];
+        $model = Usuario::findOne($id);
+        if($model != null){
+            try{
+                $model->delete();
+                $res = [
+                    'success'=>true,
+                    'message'=>'Usuario eliminado',
+                    'data'=>$model, 
+                ];
+            }catch(IntegrityException $ie){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'success'=>false,
+                    'message'=>'El usuario se encuentra en uso',
+                    'error'=>$ie->getMessage(),
+                ];
+    
+            }catch(Exception $e){
+                Yii::$app->getResponse()->setStatusCode(500);
+                $res = [
+                    'success'=>false,
+                    'message'=>'Usuario no eliminado',
+                    'error'=>$e->getMessage(),
+                ];
+            }
+        }else{
+            Yii::$app->getResponse()->setStatusCode(404);
+            $res = [
+                'success'=>false,
+                'message'=>'Usuario no eliminado',
+                'error'=>'Usuario con id: '.$id.' inexistente',
+            ];
+        }
+
+        return $res;       
     }
 
     public function actionLogin(){
@@ -107,7 +202,7 @@ class UserController extends \yii\web\Controller
             $correcto = Yii::$app->security->validatePassword($password,$model->password_hash);
             if($correcto){
                 $res=[
-                    'succes'=>true,
+                    'success'=>true,
                     'message'=>'Verificacion exitosa',
                     'data'=>[
                         'access_token'=>$model->access_token,
@@ -122,41 +217,20 @@ class UserController extends \yii\web\Controller
             }else{
                 Yii::$app->getResponse()->setStatusCode(422,'Data validation failed');
                 $res=[
-                    'succes'=>false,
+                    'success'=>false,
                     'message'=>'Datos incorrectos',
                 ];
             }
         }else{
             Yii::$app->getResponse()->setStatusCode(422,'Data validation failed');
             $res=[
-                'succes'=>false,
+                'success'=>false,
                 'message'=>'Datos incorrectos',
             ];
         }
         return $res;
     }
-    public function actionCreateRole()
-    {
-        $auth = Yii::$app->authManager;
-        $role = $auth->createRole(Yii::$app->getRequest()->getBodyParam('role'));
-        $auth->add($role);
-        return $role;
-
-    }
-    public function actionCreatePermission()
-    {
-        $auth = Yii::$app->authManager;
-        $permission = $auth->createPermission(Yii::$app->getRequest()->getBodyParam('permission'));
-        $auth->add($permission);
-        return $permission;
-    }
-    public function actionAssingRole()
-    {
-        $auth = Yii::$app->authManager;
-        $role = $auth->getRole('Espectador');
-        $auth->assign($role, 11);
-        return $role;
-    }
+    
     
     public function actionIndex()
     {
