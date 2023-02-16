@@ -69,7 +69,7 @@ class UserController extends \yii\web\Controller
     {
         $res = [];
         $body = Yii::$app->getRequest()->getBodyParams();
-        $role = isset($body['role'])?$body['role']:null;
+        $role = isset($body['role'])?$body['role']:null; //verificar si el rol existe
         $resRegisterUser = $this->actionRegisterUser($body);
         if($resRegisterUser['success']){
             $user = $resRegisterUser['data'];
@@ -127,7 +127,7 @@ class UserController extends \yii\web\Controller
         $res = [];
         $auth = Yii::$app->authManager;
         $role = $auth->getRole($userRole);
-
+        // quitar roles y asignar el nuevo
         if($role != null){
             try{
                 $auth->assign($role, $userId);
