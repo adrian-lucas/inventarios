@@ -51,10 +51,12 @@ $config = [
             'errorAction' => 'site/error',
         ],
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@app/mail',
-            // send all mails to a file by default.
-            'useFileTransport' => true,
+                'class' => 'yii\symfonymailer\Mailer',
+                'useFileTransport' => false,
+                'transport' =>
+                    [
+                        'dsn' => 'gmail+smtp://201809383@est.umss.edu:@default',
+                    ]
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
